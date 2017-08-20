@@ -57,18 +57,9 @@
 
     <?php include '/views/common/js.html';?>
     <script>
-        $.ajax({
-            url:"/api/login",
-            type:'get',
-            data:{
-                tc_name:"前端学院",
-                tc_pass:"123456"
-            },
-            success:function(info){
-                console.log(info);
-            }
+        require(['jquery',],function($,){
+            
         })
-
     </script>
 </body>
 </html>
