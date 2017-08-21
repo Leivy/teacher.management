@@ -6,8 +6,8 @@ require(["jquery","jquery_cookie"], function () {
             url: "/api/login",
             data: $("form").serialize(),
             success: function (info) {
-                // console.log($("form").serialize());
-                // console.log(info);
+                console.log($("form").serialize());
+                console.log(info);
                 if (info.code == 200) {
                     //登录成功
                     //保存用户信息到cookie中 cookie会将对象toString,所以先转换为json格式
