@@ -7,8 +7,8 @@ define([
   'use strict';
   $(function () {
     //拉取数据渲染列表
-    $.ajax({
-      type: "get",
+    $.get({
+      // type: "get",
       url: '/api/teacher',
       success: function (info) {
         if (info.code == 200) {
@@ -24,8 +24,8 @@ define([
       $("#teacherModal").modal(); //显示模态框
       //发送ajax请求 渲染模态框的内容
       var tc_id = $(this).parent().data("id");
-      $.ajax({
-        type: 'get',
+      $.get({
+        // type: 'get',
         url: '/api/teacher/view',
         data: {
           tc_id: tc_id
