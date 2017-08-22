@@ -41,7 +41,6 @@ define([
     });
 
     //注销按钮功能实现 点击事件  发送请求注销 后台就会注销并更新数据
-
     $("#teacherlist").on('click', "#delete", function () {
       var tc_id = $(this).parent().data("id");
       var tc_status = $(this).parent().data("status");
@@ -67,15 +66,14 @@ define([
       })
     });
 
-    //编辑按钮功能实现  存储tc_id到cookie中给到add.html
+    //编辑按钮功能实现  拼接tc_id到地址栏中后跳转到add.html
     $("#teacherlist").on('click', '#editor', function () {
-      $.cookie('tc_id', $(this).parent().data('id'));
+      location.href = $(this).attr('href');
+      return false;
     });
 
-    //添加教师按钮功能 跳转到add.html 清空cookie中的tc_id
+    //添加教师按钮功能 跳转到add.html 
     $("#addnewteacher").on('click', function () {
-      $.removeCookie('tc_id');
-      console.log($(this).attr('href'))
       location.href = $(this).attr('href');
       return false;
     })
