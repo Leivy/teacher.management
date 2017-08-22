@@ -1,8 +1,7 @@
 define([
   'jquery',
   'template',
-  'bootstrap',
-  'jquery_cookie'
+  'bootstrap'
 ], function ($, template) {
   'use strict';
   $(function () {
