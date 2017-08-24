@@ -1,4 +1,4 @@
-define(['jquery', 'template', 'tool', 'datepicker', 'datepicker_zh', 'jquery_cookie'], function ($, template, tool) {
+define(['jquery', 'template', 'tool', 'jquery_cookie'], function ($, template, tool) {
   $(function () {
     //判断是哪个按钮点击跳转到add.html的  通过location是否拼接参数来确定
     //先封装获取地址栏参数的方法  在common里新增tool.js存放
@@ -22,7 +22,7 @@ define(['jquery', 'template', 'tool', 'datepicker', 'datepicker_zh', 'jquery_coo
             var html = template('teacherAddTemp', info.result);
             $("#tcFormWrap").html(html);
             //加载插件设置日期
-            getDate("#tc_join_date");
+            tool.setDate("#tc_join_date");
           }
         }
       })
@@ -34,7 +34,7 @@ define(['jquery', 'template', 'tool', 'datepicker', 'datepicker_zh', 'jquery_coo
         btnTxt: '添 加'
       });
       $("#tcFormWrap").html(html);
-      getDate("#tc_join_date");
+      tool.setDate("#tc_join_date");
     }
 
     //点击保存按钮 将编辑和添加的ajax写一起 用表单序列化传输参数,编辑按钮需要的特殊值tc_id需要用隐藏域来实现传递参数
@@ -55,17 +55,7 @@ define(['jquery', 'template', 'tool', 'datepicker', 'datepicker_zh', 'jquery_coo
     });
 
     //添加插件
-    function getDate(ele) {
-      $(ele).datepicker({
-        autoclose: true,
-        endDate: "0d",
-        format: "yyyy-mm-dd",
-        language: "zh-CN",
-        todayBtn: "linked",
-        todayHighlight: true
 
-      });
-    }
 
   })
 })

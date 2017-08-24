@@ -21,7 +21,9 @@ define([
       var pathObj = {
         "/teacher/add": "/teacher/list",
         "/settings": "/",
-        '/user/profile': '/user/list'
+        '/user/profile': '/user/list',
+        '/repass': '/',
+        '/category/add': '/category/list'
       }
       pathname = pathObj[pathname] || pathname;
 

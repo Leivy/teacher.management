@@ -1,4 +1,4 @@
-define([], function (require, factory) {
+define(['jquery', 'datepicker', 'datepicker_zh'], function ($, factory) {
   'use strict';
 
   //1.功能:获取地址栏参数 使用:传入参数返回值;不传参数返回地址栏参数对象
@@ -18,10 +18,24 @@ define([], function (require, factory) {
       pramObj[key] = value;
     });
     return pramObj[pra] || pramObj;
-  }
+  };
+
+  //2.功能:日期选择插件
+  function setDate(ele) {
+    $(ele).datepicker({
+      autoclose: true,
+      endDate: "0d",
+      format: "yyyy-mm-dd",
+      language: "zh-CN",
+      todayBtn: "linked",
+      todayHighlight: true
+
+    });
+  };
 
   //tool的产出如下:
   return {
-    getPra: getPra
+    getPra: getPra,
+    setDate: setDate
   }
 });
