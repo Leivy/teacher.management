@@ -1,73 +1,106 @@
-define([
-  'jquery',
-  'NProgress',
-  'jquery_cookie'
-], function ($, NProgress) {
-  'use strict';
+/**
+ * Created by HUCC on 2017/8/20.
+ */
+define(["jquery", "template", "nprogress", "jquery_cookie"], function ($, template, np) {
   $(function () {
-    //用来放置aside和header的功能实现 这里是所有主页面的公共部分  在js.html中引入 然后js.html被各个页面引入
-    // console.log(location.pathname);
+    
+    np.start();
+    
+    setTimeout(function () {
+      np.done();
+    }, 500);
+    
+    
+    $(document).ajaxStart(function () {
+      $(".mask").fadeIn();
+    });
+    
+    $(document).ajaxStop(function () {
+      setTimeout(function () {
+        $(".mask").fadeOut();
+      }, 400);
+    });
+    
+    //除了登录页面，其他页面都需要
     if (location.pathname !== "/login") {
-      //1.aside部分渲染头像和名称 存储在cookie中
-      var userinfo = JSON.parse($.cookie().userinfo);
-      // console.log(userinfo);
-      $(".avatar img").attr("src", userinfo.tc_avatar);
-      $(".profile h4").html(userinfo.tc_name);
-
-      //2.列表点击显示高亮 页面会跳转 所以不能注册点击事件
-      // console.log(location);
-      var $links = $(".list-unstyled a");
+      
+      
+      //判断用户有没有PHPSESSID，如果有，说明登录了，如果没有，跳转到login页面
+      if ($.cookie("PHPSESSID")) {
+        //1. 设置头像
+        var userinfo = $.cookie("userinfo");
+        userinfo = JSON.parse(userinfo);
+        var html = template("userinfo-tpl", userinfo);
+        $("#userinfo").html(html);
+      } else {
+        location.href = "/login";
+      }
+      
+      //退出登录
+      $("#logout").click(function () {
+        
+        //发送ajax请求，告诉服务器，我要退出登录
+        $.ajax({
+          type: "post",
+          url: "/api/logout",
+          success: function (info) {
+            if (info.code == 200) {
+              
+              //删除userinfo这个cookie
+              $.removeCookie("userinfo", {path: "/"});
+              //跳转到login页面
+              location.href = "/login";
+              
+            }
+          }
+        });
+        
+        
+      });
+      
+      
+      //侧边栏高亮（当前页面）
+      //获取到地址栏中pathname，跟a标签的href属性对比，如果相同，就让这个a高亮，排他
       var pathname = location.pathname;
+      
+      //记录地址栏与a标签的地址不一致
       var pathObj = {
         "/teacher/add": "/teacher/list",
         "/settings": "/",
-        '/user/profile': '/user/list',
-        '/repass': '/',
-        '/category/add': '/category/list'
+        "/repass":"/",
+        "/category/add":"/category/list",
+        "/course/step1":"/course/add",
+        "/course/step2":"/course/add",
+        "/course/step3":"/course/add",
       }
       pathname = pathObj[pathname] || pathname;
-
+      
+      
+      var $links = $(".navs a");
       $links.each(function () {
-        // console.log(location.pathname)
+        
         var $that = $(this);
-        if (pathname == $that.attr("href")) {
+        
+        $that.removeClass("active");
+        
+        //地址栏的地址和a标签的地址匹配
+        if ($that.attr("href") == pathname) {
           $that.addClass("active");
         }
+        
       });
-      //3.点击课程管理显示二级菜单
-      $("#secondary_menu").click(function () {
-        $(this).find(".list-unstyled").slideToggle();
+      
+      //如果是二级菜单的时候，点击的时候，需要展开内容
+      $(".two_menu").click(function () {
+        $(this).children("ul").slideToggle();
       });
-      $(".list-unstyled").find(".active").parent().parent().show();
-
-      //4.头部登出功能
-      $('#logout').click(function () {
-        //发送退出登录的ajax请求
-        $.post("/api/logout", function (info) {
-          //退出成功的时候,后台直接清空了PHPSESSID
-          if (info.code == 200) {
-            //退出成功记得清空cookie
-            $.removeCookie("userinfo");
-            location.href = "/login";
-          }
-        })
-        return false;
-      });
-
-      //5.页面顶部的假进度条和齿轮 noprogress插件 ajax全局事件
-      $(document).ajaxStart(function () {
-        NProgress.start();
-        $(".wrap").show();
-      });
-      $(document).ajaxStop(function () {
-        setTimeout(function () {
-          NProgress.done();
-          $(".wrap").hide();
-        }, 500)
-      });
-
-
-
-    } //if判断是否非login页面 结束处
+      
+      //如果是二级菜单下的某个菜单亮起来，需要让这个二级菜单展开的状态。
+      $(".two_menu").find(".active").parent().parent().show();
+      
+      
+    }
+    
+    
   });
-});
+})

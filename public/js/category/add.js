@@ -1,70 +1,81 @@
-define([
-  'jquery',
-  'template',
-  'tool'
-], function ($, template, tool) {
-  'use strict';
+/**
+ * Created by HUCC on 2017/8/20.
+ */
+define(["jquery", "template", "tool"], function ($, template, tool) {
+  
   $(function () {
-    var cg_id = tool.getPra('cg_id');
-    if (typeof (cg_id) != "object") {
-      //编辑
-      var url = '/api/category/modify';
-      //根据地址栏的参数来渲染表单
+    
+    //获取cg_id,如果有，编辑功能，否则，新增功能
+    var cg_id = tool.getParam("cg_id");
+    if (cg_id) {
+      
+      //发送ajax，获取当前分类的详细信息
       $.ajax({
-        type: 'get',
-        url: '/api/category/edit',
+        type: "get",
+        url: "/api/category/edit",
         data: {
           cg_id: cg_id
         },
         success: function (info) {
           if (info.code == 200) {
-            info.result.title = "课程编辑";
-            info.result.btnTxt = "编辑";
-            var html = template('cateadd', info.result);
-            $(".catewrap").html(html); //拿取cg_id对应的数据渲染编辑页面
-            $("#selectget").val(info.result.cg_pid); //让select框的value等于需要被选中的option的value,即会让那个option被选中
+            console.log(info.result);
+            var data = info.result;
+            data.title = "修改分类";
+            data.btnText = "修 改"
+            var html = template("category_add_tpl", data);
+            $(".course-category").html(html);
+            
+            
           }
         }
       });
+      
+      
     } else {
-      //添加
-      var url = '/api/category/add';
-      //发送顶级分类请求,渲染级别下拉选项
+      //发送一个ajax请求，获取所有的顶级分类，渲染到select框
       $.ajax({
-        type: 'get',
-        url: '/api/category/top',
-        success: function (info) {
-          if (info.code == 200) {
-            var html = template('cateadd', {
-              title: '课程添加',
-              btnTxt: '添加',
-              top: info.result
+        type:"get",
+        url:"/api/category/top",
+        success:function (info) {
+          if(info.code == 200){
+            var html = template("category_add_tpl", {
+              title: "添加分类",
+              btnText: "添 加",
+              top:info.result
             });
-            $(".catewrap").html(html);
-
-            // $("#cg_name").val('要啥自行车');
-            // setTimeout(function () {
-            //   $("#savebtn").click();
-            // }, 0);
-
+            $(".course-category").html(html);
           }
         }
       });
     }
-    //保存按钮注册事件发送请求 委托事件
-    $("body").on('click', '#savebtn', function () {
+    
+    
+    //给按钮注册点击事件
+    $("body").on("click", ".btn_save", function () {
+    
+      var url = "";
+      if(cg_id){
+        url = "/api/category/modify";
+      }else {
+        url = "/api/category/add"
+      }
+      
       $.ajax({
-        type: 'post',
-        url: url,
-        data: $('form').serialize(),
-        success: function (info) {
-          if (info.code == 200) {
-            location.href = '/category/list'
+        type:"post",
+        url:url,
+        data:$("form").serialize(),
+        success:function (info) {
+          if(info.code == 200){
+            location.href = "/category/list";
           }
         }
-      })
-
-      return false;
-    });
-  })
+      });
+    
+    })
+    
+    
+    
+  });
+  
+  
 });

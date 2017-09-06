@@ -1,80 +1,83 @@
-define([
-  'jquery',
-  'template',
-  'bootstrap'
-], function ($, template) {
-  'use strict';
+/**
+ * Created by HUCC on 2017/8/20.
+ */
+define(["jquery", "template", "bootstrap"],function ($, template) {
+
   $(function () {
-    //拉取数据渲染列表
     $.ajax({
-      type: "get",
-      url: '/api/teacher',
-      success: function (info) {
-        if (info.code == 200) {
-          var html = template("teacher_list_temp", info);
-          $("#teacherlist").html(html);
+      type:"get",
+      url:"/api/teacher",
+      success:function (info) {
+        if(info.code == 200){
+          //使用模版引擎渲染数据
+          var html = template("teacher_list_tpl", info);
+          $("#teacher_list").html(html);
         }
       }
     });
-    //查看按钮功能实现 点击事件 显示模态框 更新模态框数据
-    //由于列表信息是ajax渲染的 所以注册委托事件
-    $("#teacherlist").on('click', "#check", function () {
-      console.log(123)
-      $("#teacherModal").modal(); //显示模态框
-      //发送ajax请求 渲染模态框的内容
+    
+    
+    //给查看按钮注册点击事件,主要要注册委托事件
+    $("#teacher_list").on("click", ".btn_view", function () {
+      
       var tc_id = $(this).parent().data("id");
+      
+      //获取到id，发送ajax，查看讲师的详细的信息
       $.ajax({
-        type: 'get',
-        url: '/api/teacher/view',
-        data: {
-          tc_id: tc_id
+        type:"get",
+        url:"/api/teacher/view",
+        data:{
+          tc_id:tc_id
         },
-        success: function (info) {
-          if (info.code == 200) {
-            var html = template("moduletemp", info.result);
-            $("#teacherModal").html(html);
+        success:function (info) {
+          if(info.code == 200){
+          
+            var html = template("teacher_info_tpl", info.result);
+            $("#teacherModal").html(html).modal('show');
           }
         }
-      })
-      return false; //点击事件都要阻止默认行为 阻止跳转
+      });
+      
+      
+     
     });
-
-    //注销按钮功能实现 点击事件  发送请求注销 后台就会注销并更新数据
-    $("#teacherlist").on('click', "#delete", function () {
+  
+  
+    $("#teacher_list").on("click", ".btn_handle", function () {
+     
       var tc_id = $(this).parent().data("id");
       var tc_status = $(this).parent().data("status");
       var $that = $(this);
+      
       $.ajax({
-        type: 'post',
-        url: '/api/teacher/handle',
-        data: {
-          tc_id: tc_id,
-          tc_status: tc_status
+      
+        type:"post",
+        url:"/api/teacher/handle",
+        data:{
+          tc_id:tc_id,
+          tc_status:tc_status
         },
-        success: function (info) {
-          console.log(info.result.tc_status);
-          if (info.code == 200) {
-            if (info.result.tc_status == 1) {
-              $that.html('启用').removeClass('btn-warning').addClass('btn-success');
-            } else {
-              $that.html('注销').removeClass('btn-success').addClass('btn-warning');
+        success:function (info) {
+          console.log(info);
+          if(info.code == 200){
+            //根据返回的status切换当前按钮的
+            if(info.result.tc_status == 0){
+              $that.text("注 销");
+              $that.removeClass("btn-success");
+              $that.addClass("btn-warning");
+            }else {
+              $that.text("启 用");
+              $that.addClass("btn-success");
+              $that.removeClass("btn-warning");
             }
-            $that.parent().data('status', info.result.tc_status);
+            $that.parent().data("status", info.result.tc_status);
           }
         }
-      })
+      
+      });
+      
     });
-
-    //编辑按钮功能实现  拼接tc_id到地址栏中后跳转到add.html
-    $("#teacherlist").on('click', '#editor', function () {
-      location.href = $(this).attr('href');
-      return false;
-    });
-
-    //添加教师按钮功能 跳转到add.html 
-    $("#addnewteacher").on('click', function () {
-      location.href = $(this).attr('href');
-      return false;
-    })
-  })
+  
+  });
+  
 });

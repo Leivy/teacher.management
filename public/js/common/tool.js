@@ -1,41 +1,46 @@
-define(['jquery', 'datepicker', 'datepicker_zh'], function ($, factory) {
-  'use strict';
-
-  //1.功能:获取地址栏参数 使用:传入参数返回值;不传参数返回地址栏参数对象
-  function getPra() {
-    //先获取地址栏参数字符串
-    var pra = arguments[0];
-    var pram = location.search;
-    //再去除第一个问号
-    pram = pram.slice(1);
-    //将参数字符串切割成数组形式
-    var pramArr = pram.split("&");
-    //再将数组转换成对象形式
-    var pramObj = {};
-    pramArr.forEach(function (v, i) {
-      var key = v.split("=")[0];
-      var value = v.split("=")[1];
-      pramObj[key] = value;
-    });
-    return pramObj[pra] || pramObj;
-  };
-
-  //2.功能:日期选择插件
-  function setDate(ele) {
-    $(ele).datepicker({
-      autoclose: true,
-      endDate: "0d",
-      format: "yyyy-mm-dd",
-      language: "zh-CN",
-      todayBtn: "linked",
-      todayHighlight: true
-
-    });
-  };
-
-  //tool的产出如下:
-  return {
-    getPra: getPra,
-    setDate: setDate
+/**
+ * Created by HUCC on 2017/8/22.
+ */
+define(["jquery", "datepicker", "datepicker_cn"], function ($) {
+  
+  function getParamObj() {
+    var paramStr = location.search;
+    //去除第一个?
+    paramStr = paramStr.slice(1);
+    
+    var paramArr = paramStr.split("&");
+    var paramObj = {};
+    for(var i = 0; i < paramArr.length; i++) {
+      var key = paramArr[i].split("=")[0];
+      var value = paramArr[i].split("=")[1];
+      
+      paramObj[key] = value;
+    }
+    return paramObj;
   }
+  
+  function getParam(key) {
+    return getParamObj()[key];
+  }
+  
+  function setDate(ele) {
+    //不行：这个时候页面还能东西
+    $(ele).datepicker({
+      format: 'yyyy-mm-dd',//日期的格式
+      //startDate: '-10d',  //可以选择的开始时间
+      endDate:"+0d",        //选择的结束时间
+      autoclose:true,      //选完日期自动关闭
+      language:"zh-CN",     //选择语言，注意需要额外引入一个语言包
+      todayBtn:"linked",
+      todayHighlight:true
+    });
+  }
+  
+  return {
+    getParamObj:getParamObj,
+    getParam:getParam,
+    setDate:setDate
+  }
+  
+  
 });

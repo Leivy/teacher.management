@@ -1,61 +1,76 @@
-define(['jquery', 'template', 'tool', 'jquery_cookie'], function ($, template, tool) {
+/**
+ * Created by HUCC on 2017/8/22.
+ */
+define(["jquery", "template", "tool"], function ($, template, tool) {
   $(function () {
-    //判断是哪个按钮点击跳转到add.html的  通过location是否拼接参数来确定
-    //先封装获取地址栏参数的方法  在common里新增tool.js存放
-    // var tc_id = tool.getPra(tc_id);
-    // console.log(tc_id);
-    var tc_id = tool.getPra("tc_id");
-    if (typeof (tc_id) == "string") {
-      //编辑功能实现
-      var url = "/api/teacher/update";
-      //编辑接口 拉取数据渲染页面
+    //需要判断是新增还是修改，获取到地址中的tc_id, 如果tc_id有值，说明是修改操作，否则就是新增操作。
+    var tc_id = tool.getParam("tc_id");
+    if (tc_id) {
+      //编辑
+      //发送一个ajax请求，把tc_id对应的讲师信息获取到
       $.ajax({
-        type: 'get',
-        url: '/api/teacher/edit',
+        type: "get",
+        url: "/api/teacher/edit",
         data: {
-          tc_id: tc_id,
+          tc_id: tc_id
         },
         success: function (info) {
           if (info.code == 200) {
-            info.result.title = '讲师编辑';
-            info.result.btnTxt = '编 辑';
-            var html = template('teacherAddTemp', info.result);
-            $("#tcFormWrap").html(html);
-            //加载插件设置日期
+            var data = info.result;
+            data.title = "讲师编辑";
+            data.btnText = "修 改";
+            data.type = "edit";
+            var html = template("teacher_add_tpl", data);
+            $(".teacher").html(html);
+            
             tool.setDate("#tc_join_date");
+            
           }
         }
       })
+      
     } else {
-      //添加功能实现
-      var url = "/api/teacher/add";
-      var html = template('teacherAddTemp', {
-        title: '讲师添加',
-        btnTxt: '添 加'
+      //新增
+      var html = template("teacher_add_tpl", {
+        title: "讲师新增",
+        btnText: "添 加",
+        type: "add"
       });
-      $("#tcFormWrap").html(html);
+      $(".teacher").html(html);
       tool.setDate("#tc_join_date");
     }
-
-    //点击保存按钮 将编辑和添加的ajax写一起 用表单序列化传输参数,编辑按钮需要的特殊值tc_id需要用隐藏域来实现传递参数
-    $('body').on('click', '#editor_add', function () {
-      $that = $(this);
+    
+    
+    //给按钮注册点击事件
+    $("body").on("click", ".btn_add", function () {
+      
+      var url = "";
+      if (tc_id) {
+        //发送编辑的ajax
+        url = "/api/teacher/update";
+      } else {
+        //发送添加的ajax
+        url = "/api/teacher/add";
+      }
+      
       $.ajax({
-        type: 'post',
+        type: "post",
         url: url,
-        data: $('form').serialize(),
+        data: $("form").serialize(),
         success: function (info) {
           if (info.code == 200) {
-            console.log()
-            location.href = $that.attr('href');
+            location.href = "/teacher/list";
           }
         }
       });
-      return false;
+      
+      
     });
-
-    //添加插件
-
-
-  })
-})
+    
+    
+    
+    
+  });
+  
+  
+});

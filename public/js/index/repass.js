@@ -1,35 +1,40 @@
-define([
-  'jquery',
-], function ($, factory) {
-  'use strict';
+/**
+ * Created by HUCC on 2017/8/23.
+ */
+define(["jquery"],function ($) {
   $(function () {
-
-    $("#savebtn").click(function () {
-      var pass = $("#pass").val();
-      var newpass = $("#newpass").val();
-      var conpass = $("#conpass").val();
-      console.log([pass, newpass, conpass])
-      //发送请求修改密码
+  
+    //1. 给按钮注册点击事件
+    //2. 判断新密码与确认密码是否一直，如果不一致，不发送ajax请求
+    //3. 发送ajax请求，如果成功，触发退出登录事件
+    $(".btn_modify").click(function () {
+      
+      var tc_new_pass = $("#tc_new_pass").val();
+      var tc_confirm_pass = $("#tc_confirm_pass").val();
+      if(tc_confirm_pass != tc_new_pass){
+        alert("确认密码与新密码不一致")
+        return false;
+      }
+      
+      
       $.ajax({
-        type: 'post',
-        url: '/api/teacher/repass',
-        data: {
-          tc_pass: pass,
-          tc_new_pass: newpass
-        },
-        beforeSend: function () {
-          //判断新密码两次输入是否正确
-          // $("#conpass").blur(function () {});
-          if (newpass != conpass) return false;
-        },
-        success: function (info) {
-          if (info.code == 200) {
-            $('#logout').click();
+        type:"post",
+        url:"/api/teacher/repass",
+        data:$("form").serialize(),
+        success:function (info) {
+          if(info.code == 200){
+            alert("密码修改成功，请重新登录");
+            $("#logout").click();
           }
+          
         }
-      })
-      return false;
-    })
-
-  })
+      });
+      
+      
+    });
+    
+    
+  
+  });
+  
 });
